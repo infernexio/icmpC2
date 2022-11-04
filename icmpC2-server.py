@@ -13,13 +13,14 @@ args = parser.parse_args()
     
 def cmd(packet):
     if packet[IP].src == args.destination_ip and packet[ICMP].type == 0 and packet[ICMP].id == ICMP_ID and packet[Raw].load:
-        icmpPacket = (packet[Raw].load).decode('utf-8', errors = 'ignore', store = '0')
+        icmpPacket = (packet[Raw].load).decode('utf-8', errors = 'ignore').replace('\n','')
         print(icmpPacket)
     else:
         pass
 
 def start_sniff():
-    sniff(prn=cmd, filter="icmp", store="0")
+    #change iface as you network may be setup differently
+    sniff(iface 'eth0 ',prn=cmd, filter="icmp", store="0")
 
 def main():
     sniffer = Process(target=start_sniff)
