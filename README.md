@@ -10,10 +10,10 @@ This project a command and control server that obfuscates the traffic as icmp(pi
 
 # To use
 First make sure you have the scapy python module downloaded the module is used for sniffing and obfuscating data as different protocols:<br>
-  to do so run pip3 isntall scapy<br> and let it download<br><br>
+  &nbsp;to do so run pip3 isntall scapy<br> and let it download<br><br>
 Then clone this repo and run the server and client<br>
-  to do so you may give the python script executable privileges with chmod 777 icmpC2-server/client.py<br>
-  or run with python3 filename.py<br><br>
+  &nbsp;to do so you may give the python script executable privileges with chmod 777 icmpC2-server/client.py<br>
+  &nbsp;or run with python3 filename.py<br><br>
   
 <img width="935" alt="image" src="https://user-images.githubusercontent.com/47786532/200013354-75da21c4-60a1-4d12-878c-52bde53a1e46.png">
 or 
