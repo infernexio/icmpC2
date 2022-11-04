@@ -5,6 +5,11 @@ import argparse
 ICMP_ID = 13170 
 time_to_live = 64
 
+#checks arguments passed in by user
+parser = argparse.ArgumentParser()
+parser.add_argument('-i' '--interface', type=str, required=True, help="Listener (virtual) Network Interface eth0")
+parser.add_argument('-d', '--destination_ip', type=str, required=True, help="Destination IP adress")
+args = parser.parse_args()
     
 def cmd(packet):
     if packet[IP].src == args.destination_ip and packet[ICMP].type == 0 and packet[ICMP].id == ICMP_ID and packet[Raw].load:
@@ -14,7 +19,7 @@ def cmd(packet):
         pass
 
 def start_sniff():
-    sniff(iface=args.interface, prn=cmd, filter='icmp', store='0')
+    sniff(prn=cmd, filter="icmp", store="0")
 
 def main():
     sniffer = Process(target=start_sniff)
@@ -41,12 +46,5 @@ if __name__ == "__main__":
         print('[!] Please install the python3 scapy module')
         print('[!] use the command pip3 install scapy')
         exit()
-        
-
-    #checks arguments passed in by user
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-i' '--interface', type=str, required=True, help="Listener (virtual) Network Interface eth0")
-    parser.add_argument('-d', '--destination_ip', type=str, required=True, help="Destination IP adress")
-    args = parser.parse_args()
 
     main()
