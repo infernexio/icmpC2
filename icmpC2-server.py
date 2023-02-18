@@ -20,7 +20,7 @@ def cmd(packet):
 
 def start_sniff():
     #change iface as you network may be setup differently
-    sniff(iface 'eth0 ',prn=cmd, filter="icmp", store="0")
+    sniff(iface='eth0 ',prn=cmd, filter="icmp", store="0")
 
 def main():
     sniffer = Process(target=start_sniff)
